@@ -61,7 +61,7 @@ export function AISummaryPanel({ serverId = '1' }: AISummaryPanelProps) {
     [summary],
   );
 
-  const generateImage = async (prompt: string): Promise<string | null> => {
+  const generateImage = async (prompt: string, forceRefresh = false): Promise<string | null> => {
     try {
       const res = await fetch(`${API_BASE}/ai/generate-image`, {
         method: 'POST',
@@ -69,7 +69,11 @@ export function AISummaryPanel({ serverId = '1' }: AISummaryPanelProps) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${publicAnonKey}`,
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ 
+          prompt,
+          serverId,
+          forceRefresh
+        }),
       });
       if (!res.ok) return null;
       const data = await res.json();
@@ -127,11 +131,8 @@ export function AISummaryPanel({ serverId = '1' }: AISummaryPanelProps) {
       }
 
       // 3. Generate Highlight Image in background (Only if we don't have one or manual)
-      // Note: We don't cache images in KV to avoid size issues, but highlightImageUrl is in state.
-      // If we got from cache, it's fine to re-generate images or just skip if we wanted to be more efficient.
-      // For now, let's generate them to keep it alive.
       if (nextSummary.imagePrompt) {
-        generateImage(nextSummary.imagePrompt).then(url => {
+        generateImage(nextSummary.imagePrompt, isManual).then(url => {
           if (url) setHighlightImageUrl(url);
         });
       }
@@ -139,7 +140,7 @@ export function AISummaryPanel({ serverId = '1' }: AISummaryPanelProps) {
       // 4. Generate Images for Meme Cards in background
       nextCards.forEach((card) => {
         if (card.prompt) {
-          generateImage(card.prompt).then(url => {
+          generateImage(card.prompt, isManual).then(url => {
             if (url) {
               setCards(prev => prev.map(c => c.id === card.id ? { ...c, imageUrl: url } : c));
             }

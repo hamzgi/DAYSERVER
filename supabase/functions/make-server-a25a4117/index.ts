@@ -258,12 +258,24 @@ ${transcript}
 app.post("/ai/generate-image", async (c) => {
   try {
     const body = await c.req.json();
-    const { prompt, aspectRatio = "1:1" } = body;
+    const { prompt, serverId, forceRefresh } = body;
     const geminiApiKey = Deno.env.get("GEMINI_API_KEY");
     const model = "gemini-2.5-flash-image";
 
     if (!geminiApiKey) return c.json({ error: "Gemini API key not configured" }, 500);
     if (!prompt) return c.json({ error: "Prompt is required" }, 400);
+
+    // 1. Check Cache
+    // We use a short hash of the prompt to avoid very long keys
+    const promptHash = btoa(prompt).slice(0, 32);
+    const cacheKey = `image_cache:${serverId || "global"}:${promptHash}`;
+    
+    if (!forceRefresh) {
+      const cached = await kv.get(cacheKey);
+      if (cached) {
+        return c.json({ imageUrl: cached, source: "cache" });
+      }
+    }
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`,
@@ -272,9 +284,6 @@ app.post("/ai/generate-image", async (c) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            // Some image models might use specific parameters
-          }
         }),
       }
     );
@@ -286,14 +295,16 @@ app.post("/ai/generate-image", async (c) => {
     }
 
     const data = await response.json();
-    // Assuming the image data is returned as a base64 string in an inlineData part
-    // or as a URL if it's a specific image generation response.
-    // For gemini-2.5-flash-image (Nano Banana), it typically returns the image part.
     const imagePart = data?.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData);
     
     if (imagePart) {
+      const imageUrl = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
+      
+      // 2. Save to Cache
+      await kv.set(cacheKey, imageUrl);
+
       return c.json({ 
-        imageUrl: `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`,
+        imageUrl: imageUrl,
         source: "gemini-2.5-flash-image"
       });
     }
