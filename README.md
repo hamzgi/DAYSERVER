@@ -50,3 +50,4 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ## GCP 배포
 
 자세한 배포 가이드는 아래 섹션을 참고하세요.
+# DAYSERVER2
