@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, Hash, Image as ImageIcon, Sparkles, MoreHori
 import { ServerDisplaySettingsModal } from './ServerDisplaySettingsModal';
 import { ServerSelectorModal } from './ServerSelectorModal';
 import { DateServersModal } from './DateServersModal';
-import { projectId, publicAnonKey } from '../../../utils/supabase/info';
+import { functionName, projectId, publicAnonKey } from '../../../utils/supabase/info';
 
 interface Server {
   id: string;
@@ -26,7 +26,7 @@ const initialMockServers: Server[] = [
   { id: '4', name: '생일 파티', date: '2026-05-09', displayType: 'text', color: 'bg-green-500' },
 ];
 
-const API_BASE = `https://${projectId}.supabase.co/functions/v1/make-server-a25a4117`;
+const API_BASE = `https://${projectId}.supabase.co/functions/v1/${functionName}`;
 
 export function CalendarView({ onServerClick }: CalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());

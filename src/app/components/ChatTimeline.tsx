@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Image, Plus, Send } from 'lucide-react';
-import { projectId, publicAnonKey } from '../../../utils/supabase/info';
+import { functionName, projectId, publicAnonKey } from '../../../utils/supabase/info';
 
 interface Message {
   id: string;
@@ -17,7 +17,7 @@ interface ChatTimelineProps {
   user?: any;
 }
 
-const API_BASE = `https://${projectId}.supabase.co/functions/v1/make-server-a25a4117`;
+const API_BASE = `https://${projectId}.supabase.co/functions/v1/${functionName}`;
 
 const formatTime = (timestamp: string) => {
   const date = new Date(timestamp);
