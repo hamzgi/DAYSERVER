@@ -1,10 +1,11 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { supabase } from '../../../utils/supabase/client';
 import logoIcon from '../../imports/_______.png';
 
 export function LandingPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [nickname, setNickname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -39,8 +40,13 @@ export function LandingPage() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!email || !password || !confirmPassword) {
-      alert('모든 항목을 입력해주세요.');
+    if (!nickname || !email || !password || !confirmPassword) {
+      alert('닉네임, 이메일, 비밀번호를 모두 입력해주세요.');
+      return;
+    }
+
+    if (nickname.trim().length < 2) {
+      alert('닉네임은 2자 이상 입력해주세요.');
       return;
     }
 
@@ -59,14 +65,21 @@ export function LandingPage() {
       const { error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            full_name: nickname.trim(),
+            nickname: nickname.trim(),
+          },
+        },
       });
 
       if (error) {
         console.error('Sign up error:', error);
         alert(`회원가입 실패: ${error.message}`);
       } else {
-        alert('회원가입이 완료되었습니다! 로그인해주세요.');
+        alert('회원가입이 완료되었습니다. 로그인해주세요.');
         setIsSignUp(false);
+        setNickname('');
         setPassword('');
         setConfirmPassword('');
       }
@@ -86,12 +99,27 @@ export function LandingPage() {
             <img src={logoIcon} alt="DAYSERVER" className="w-24 h-24 rounded-2xl shadow-lg" />
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-3">DAYSERVER</h1>
-          <p className="text-gray-600 text-lg">
-            하루를 기록하는 가장 쉬운 방법
-          </p>
+          <p className="text-gray-600 text-lg">하루를 기록하는 가장 쉬운 방법</p>
         </div>
 
         <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-4">
+          {isSignUp && (
+            <div>
+              <label htmlFor="nickname" className="block text-sm font-medium text-gray-700 mb-2">
+                닉네임
+              </label>
+              <input
+                id="nickname"
+                type="text"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder="닉네임을 입력하세요"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                disabled={loading}
+              />
+            </div>
+          )}
+
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
               이메일
@@ -104,6 +132,7 @@ export function LandingPage() {
               placeholder="example@email.com"
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               disabled={loading}
+              autoComplete="email"
             />
           </div>
 
@@ -119,6 +148,7 @@ export function LandingPage() {
               placeholder="최소 6자 이상"
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               disabled={loading}
+              autoComplete={isSignUp ? 'new-password' : 'current-password'}
             />
           </div>
 
@@ -135,6 +165,7 @@ export function LandingPage() {
                 placeholder="비밀번호를 다시 입력하세요"
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 disabled={loading}
+                autoComplete="new-password"
               />
             </div>
           )}
@@ -144,11 +175,7 @@ export function LandingPage() {
             disabled={loading}
             className="w-full py-4 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl font-semibold transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? (
-              <span>처리 중...</span>
-            ) : (
-              <span>{isSignUp ? '회원가입' : '로그인'}</span>
-            )}
+            {loading ? <span>처리 중...</span> : <span>{isSignUp ? '회원가입' : '로그인'}</span>}
           </button>
         </form>
 
@@ -156,6 +183,7 @@ export function LandingPage() {
           <button
             onClick={() => {
               setIsSignUp(!isSignUp);
+              setNickname('');
               setPassword('');
               setConfirmPassword('');
             }}
@@ -168,7 +196,8 @@ export function LandingPage() {
 
         <div className="mt-8 text-center">
           <p className="text-gray-500 text-sm">
-            계속 진행하면 DAYSERVER의<br />
+            계속 진행하면 DAYSERVER의
+            <br />
             서비스 약관 및 개인정보 보호정책에 동의하게 됩니다.
           </p>
         </div>

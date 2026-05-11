@@ -10,6 +10,7 @@ interface Widget {
 
 interface MyPageProps {
   userId: string;
+  user?: any;
   isOwner: boolean;
 }
 
@@ -20,7 +21,7 @@ const defaultWidgets: Widget[] = [
   { id: '4', type: 'gallery', position: 3 },
 ];
 
-export function MyPage({ userId, isOwner }: MyPageProps) {
+export function MyPage({ userId, user, isOwner }: MyPageProps) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [bannerImage, setBannerImage] = useState('https://images.unsplash.com/photo-1557683316-973673baf926?w=1200');
   const [profileImage, setProfileImage] = useState(`https://api.dicebear.com/7.x/avataaars/svg?seed=${userId || 'user'}`);
@@ -28,6 +29,7 @@ export function MyPage({ userId, isOwner }: MyPageProps) {
   const [bio, setBio] = useState('여행과 사진을 좋아하는 개발자입니다.');
   const [widgets, setWidgets] = useState<Widget[]>(defaultWidgets);
   const [showBannerCustomize, setShowBannerCustomize] = useState(false);
+  const displayName = user?.user_metadata?.nickname || user?.user_metadata?.full_name || user?.email?.split('@')[0] || userId || 'user';
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -68,8 +70,8 @@ export function MyPage({ userId, isOwner }: MyPageProps) {
             <div className="flex items-center gap-4">
               <img src={profileImage} alt="Profile" className="w-20 h-20 rounded-full" />
               <div>
-                <h3 className="text-xl font-bold text-gray-900">{userId || 'user'}</h3>
-                <p className="text-gray-600 text-sm">@{userId || 'user'}</p>
+                <h3 className="text-xl font-bold text-gray-900">{displayName}</h3>
+                <p className="text-gray-600 text-sm">@{displayName}</p>
                 <div className="flex gap-4 mt-2 text-sm">
                   <span><strong>142</strong> 친구</span>
                   <span><strong>28</strong> 게시물</span>
@@ -215,8 +217,8 @@ export function MyPage({ userId, isOwner }: MyPageProps) {
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex items-start justify-between">
             <div className="flex-1 text-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-1">{userId || 'user'}</h1>
-              <p className="text-gray-600 mb-3">@{userId || 'user'}</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-1">{displayName}</h1>
+              <p className="text-gray-600 mb-3">@{displayName}</p>
               <div className="flex gap-6 text-sm justify-center">
                 <span className="text-gray-700"><strong className="text-gray-900">142</strong> 친구</span>
                 <span className="text-gray-700"><strong className="text-gray-900">28</strong> 게시물</span>

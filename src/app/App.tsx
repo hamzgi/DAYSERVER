@@ -118,7 +118,7 @@ export default function App() {
         )}
         {currentView === 'calendar' && <CalendarView onServerClick={handleServerClick} />}
         {currentView === 'friend' && <FriendPage friendId={selectedFriendId || '1'} />}
-        {currentView === 'mypage' && <MyPage userId={user?.id || 'guest'} isOwner={true} />}
+        {currentView === 'mypage' && <MyPage userId={user?.id || 'guest'} user={user} isOwner={true} />}
       </div>
 
       {/* Mobile Layout */}
@@ -146,7 +146,7 @@ export default function App() {
           )}
           {currentView === 'calendar' && <CalendarView onServerClick={handleServerClick} />}
           {currentView === 'friend' && <FriendPage friendId={selectedFriendId || '1'} />}
-          {currentView === 'mypage' && <MyPage userId={user?.id || 'guest'} isOwner={true} />}
+          {currentView === 'mypage' && <MyPage userId={user?.id || 'guest'} user={user} isOwner={true} />}
         </div>
 
         <MobileBottomNav
