@@ -53,7 +53,7 @@ export function AISummaryPanel({ serverId = '1' }: AISummaryPanelProps) {
       },
       {
         icon: <Heart className="w-5 h-5" />,
-        title: '오늘의 주인공',
+        title: '오늘의 하이라이트',
         content: summary.highlights.slice(0, 3).join('\n'),
         color: 'from-pink-400 to-rose-400',
       },
