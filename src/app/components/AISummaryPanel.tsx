@@ -47,13 +47,13 @@ export function AISummaryPanel({ serverId = '1' }: AISummaryPanelProps) {
       },
       {
         icon: <MessageSquare className="w-5 h-5" />,
-        title: '오늘의 명문장',
+        title: '오늘의 명대사',
         content: summary.quote,
         color: 'from-blue-400 to-cyan-400',
       },
       {
         icon: <Heart className="w-5 h-5" />,
-        title: '오늘의 하이라이트',
+        title: '오늘의 주인공',
         content: summary.highlights.slice(0, 3).join('\n'),
         color: 'from-pink-400 to-rose-400',
       },
